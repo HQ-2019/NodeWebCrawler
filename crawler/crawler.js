@@ -120,8 +120,8 @@ function filterMoneyHomeData(html) {
     }
 
     // console.log("古币时代: " + periodName + "   编码: " + item + "   URL:" + periodListUrl)
-    // 加载periodListUrl获取古币列表的数据 默认页码是为0
-    loadMoneyPeriodLisUrl(periodListUrl, 0, moneyInfo)
+    // 加载periodListUrl获取古币列表的数据 默认页码是为1
+    loadMoneyPeriodLisUrl(periodListUrl, 1, moneyInfo)
   })
 }
 
@@ -135,10 +135,7 @@ function filterMoneyPeriodListData(html, index, moneyInfo) {
   var moneyItems = $('.sc_list').children()
   // console.log("\n时代编号: " + moneyInfo.periodCode + "  时代名称: " + moneyInfo.periodName + "  古币数量: " + moneyItems.length)
 
-  /**
-   *  需要考虑到列表有分页的情况
-   */
-
+  // 获取当前页的数据
   moneyItems.each(function (item) {
     var modeyItem = $(this)
 
@@ -157,6 +154,22 @@ function filterMoneyPeriodListData(html, index, moneyInfo) {
     if (!fsExistsSync(imagePath)) {
       downloadImage(moneyInfo.moneyThumbnailUrl, imagePath)
     }
+
+
+    // // 获取下一页的页码和地址
+    // var pageNumber = $('.pagingNormal').text()
+    //
+    // // 判断是否还有更多的分页
+    // if (pageNumber > index) {
+    //   var onclick = $('.pagingNormal').attr('onclick')
+    //   var array = onclick.match(/zgqbbwg(\S*)html/);
+    //   var pageUrl = host + '/' + array[0]
+    //   console.log('当前页码:' +  pageNumber + "  标签: " +pageUrl + "点击事件: " + onclick)
+    //   // $('.pagingNormal').map(function (I, page) {
+    //   // console.log('页码: ' + page.attr('onclick') )
+    //   // })
+    //   loadMoneyPeriodLisUrl(pageUrl, pageNumber, moneyInfo)
+    // }
 
   })
 }
