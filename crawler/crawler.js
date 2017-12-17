@@ -150,12 +150,13 @@ function filterMoneyPeriodListData(html, index, moneyInfo) {
 
     // console.log("古币编号: " + moneyInfo.moneyCode + "  古币名称: " + moneyInfo.moneyName + "  详情页面的URL: " + moneyDetailUrl)
 
-    // var ext = moneyInfo.moneyThumbnailUrl.split('.').pop()  // 获取图片的格式
     var imagePath = createFilePath(moneyInfo.periodCode, moneyInfo.moneyCode + getImageFormat(moneyInfo.moneyThumbnailUrl))
     // 加载古币详情
     loadMoneyDetailUrl(moneyDetailUrl, moneyInfo)
-    // 下载缩略图
-    downloadImage(moneyInfo.moneyThumbnailUrl, imagePath)
+    // 下载缩略图 (当图片还未存在时)
+    if (!fsExistsSync(imagePath)) {
+      downloadImage(moneyInfo.moneyThumbnailUrl, imagePath)
+    }
 
   })
 }
@@ -174,12 +175,13 @@ function filterMoneyDetailData(html, moneyInfo) {
     var imageUrl = imageItem.find('img').attr('src')
 
     if (imageUrl){
-      // var ext = imageUrl.split('.').pop()  // 获取图片的格式
       var imageName = moneyInfo.moneyCode + '_' + (1 + item) + getImageFormat(imageUrl)
       var imagePath = createFilePath(moneyInfo.periodCode, imageName)
       // console.log("古币编号: " + moneyInfo.moneyCode + "  古币名称: " + moneyInfo.moneyName + "详情图片存放路径: " + imagePath + "  详情图片URL: " + imageUrl)
-      // 下载图片
-      downloadImage(encodeURI(host + imageUrl), imagePath)
+      // 下载图片 (当图片还未存在时 )
+      if (!fsExistsSync(imagePath)) {
+        downloadImage(encodeURI(host + imageUrl), imagePath)
+      }
     }
   })
 
