@@ -1,10 +1,11 @@
 var http = require('http')
 var cheerio = require('cheerio')
 var fs = require('fs')
-var bufferhelper = require("bufferhelper");
+var moneyController = require('./controller/moneycontroller')
 var url = 'http://www.cnm.com.cn/zgqbbwg/132452/index.html'
 var host = 'http://www.cnm.com.cn'
 var imageSource = __dirname + '/images'   // 存放图片的目录地址
+
 
 /**
  * 加载古币首页
@@ -198,6 +199,12 @@ function filterMoneyDetailData(html, moneyInfo) {
       }
     }
   })
+
+  // 将数据入库
+  var result = moneyController.insertItem(moneyInfo)
+  if (result) {
+
+  }
 }
 
 /**

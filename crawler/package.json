@@ -5,7 +5,9 @@
   "main": "crawler.js",
   "dependencies": {
     "bufferhelper": "^0.2.1",
-    "cheerio": "^1.0.0-rc.2"
+    "cheerio": "^1.0.0-rc.2",
+    "mysql2": "^1.5.1",
+    "sequelize": "^4.28.5"
   },
   "devDependencies": {},
   "scripts": {
