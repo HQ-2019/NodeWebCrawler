@@ -4,10 +4,8 @@
  */
 
 const db = require('../config/dbConfig')
-const  moneyModel = require('../models/ms_test_money')
 const moneyDB = db.moneyDB // 引入数据库
-console.log(moneyDB)
-const moneyInfo = moneyDB.import(moneyModel) // 用sequelize的import方法引入表结构。
+const moneyInfo = moneyDB.import('../models/ms_money') // 用sequelize的import方法引入表结构。
 
 const insertItem = async function (item) {
   await moneyInfo.create({
