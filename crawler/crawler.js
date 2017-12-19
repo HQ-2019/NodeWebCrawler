@@ -1,7 +1,7 @@
 var http = require('http')
 var cheerio = require('cheerio')
 var fs = require('fs')
-var moneyController = require('./controller/moneycontroller')
+var moneyController = require('./controller/moneyController')
 var url = 'http://www.cnm.com.cn/zgqbbwg/132452/index.html'
 var host = 'http://www.cnm.com.cn'
 var imageSource = __dirname + '/images'   // 存放图片的目录地址
@@ -185,25 +185,28 @@ function filterMoneyDetailData(html, moneyInfo) {
 
   var imageList = $('.w940').children()
 
+  var url = ''
   imageList.each(function (item) {
     var imageItem = $(this)
     var imageUrl = imageItem.find('img').attr('src')
 
     if (imageUrl){
+      imageUrl = host + imageUrl
+      url =  url + (url.length > 0 ? ';' : '') + imageUrl
       var imageName = moneyInfo.moneyCode + '_' + (1 + item) + getImageFormat(imageUrl)
       var imagePath = createFilePath(moneyInfo.periodCode, imageName)
       console.log("古币编号: " + moneyInfo.moneyCode + "  古币名称: " + moneyInfo.moneyName + "  详情图片存放路径: " + imagePath + "  详情图片URL: " + imageUrl)
       // 下载图片 (当图片还未存在时 )
       if (!fsExistsSync(imagePath)) {
-        downloadImage(encodeURI(host + imageUrl), imagePath)
+        downloadImage(encodeURI(imageUrl), imagePath)
       }
     }
   })
 
   // 将数据入库
+  moneyInfo.moneyDetailUrl = url
   var result = moneyController.insertItem(moneyInfo)
   if (result) {
-
   }
 }
 
@@ -279,8 +282,6 @@ function getImageFormat(imageUrl) {
   var ext = imageUrl.split('.').pop()  // 获取图片的格式
   return '.' + ext
 }
-
-
 
 // 设置启动项
 loadMoneyHomeUrl(url)
