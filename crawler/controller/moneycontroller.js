@@ -16,7 +16,7 @@ const insertItem = async function (item) {
     money_content: item.moneyContent,
     thumbnail_url: item.moneyThumbnailUrl,
     detail_url: item.moneyDetailUrl,
-    price: 120.0,
+    price: item.price,
     create_time: new Date(),
     update_time: new Date()
   })

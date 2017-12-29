@@ -7,6 +7,18 @@ var host = 'http://www.cnm.com.cn'
 var imageSource = __dirname + '/images'   // 存放图片的目录地址
 var imageHost = 'http://download.iqianzhan.com/'
 
+var moneyPrices = [
+  {periodCode: 1000, min: 900, max: 1500},
+  {periodCode: 2000, min: 700, max: 1200},
+  {periodCode: 3000, min: 700, max: 1200},
+  {periodCode: 4000, min: 650, max: 1000},
+  {periodCode: 5000, min: 500, max: 900},
+  {periodCode: 6000, min: 600, max: 800},
+  {periodCode: 7000, min: 100, max: 500},
+  {periodCode: 8000, min: 50, max: 300},
+  {periodCode: 9000, min: 1000, max: 3000},
+]
+
 
 /**
  * 加载古币首页
@@ -107,7 +119,8 @@ function filterMoneyHomeData(html) {
       moneyCode: moneyCode,
       moneyContent: moneyContent,
       moneyThumbnailUrl: moneyThumbnailUrl,
-      moneyDetailUrl: moneyDetailUrl
+      moneyDetailUrl: moneyDetailUrl,
+      price: 0
     }
 
     console.log("古币时代: " + periodName + "   编码: " + item + "   URL:" + periodListUrl)
@@ -141,7 +154,8 @@ function filterMoneyPeriodListData(html, index, lastPageItemNumer, moneyInfo) {
       moneyCode: moneyInfo.moneyCode,
       moneyContent: moneyInfo.moneyContent,
       moneyThumbnailUrl: moneyInfo.moneyThumbnailUrl,
-      moneyDetailUrl: moneyInfo.moneyDetailUrl
+      moneyDetailUrl: moneyInfo.moneyDetailUrl,
+      price: 0
     }
     info.moneyName = modeyItem.find('p').find('a').text()
     info.moneyCode = moneyInfo.periodCode + (item + 1 + lastPageItemNumer)
@@ -189,8 +203,9 @@ function filterMoneyDetailData(html, moneyInfo) {
   var url = ''
   imageList.each(function (item) {
     var imageItem = $(this)
-    var imageUrl = imageItem.find('img').attr('src')
+    var imageUrl = imageItem.find('img').attr('src') // 网页上的图片资源地址
 
+    // 古币描述
     var content = imageItem.text()
     if (content.length > 0) {
       moneyInfo.moneyContent = content
@@ -198,9 +213,11 @@ function filterMoneyDetailData(html, moneyInfo) {
 
     if (imageUrl){
       imageUrl = host + imageUrl
-      url =  url + (url.length > 0 ? ';' : '') + imageUrl
+      // url =  url + (url.length > 0 ? ';' : '') + imageUrl
       var imageName = moneyInfo.moneyCode + '_' + (1 + item) + getImageFormat(imageUrl)
       var imagePath = createFilePath(moneyInfo.periodCode, imageName)
+      var detaillUrl = imageHost + imageName
+      url =  url + (url.length > 0 ? ';' : '') + detaillUrl
       console.log("古币编号: " + moneyInfo.moneyCode + "  古币名称: " + moneyInfo.moneyName + "  详情图片存放路径: " + imagePath + "  详情图片URL: " + imageUrl)
       // 下载图片 (当图片还未存在时 )
       if (!fsExistsSync(imagePath)) {
@@ -208,6 +225,16 @@ function filterMoneyDetailData(html, moneyInfo) {
       }
     }
   })
+
+  // 获取古币价格
+  for (var index in moneyPrices) {
+    var obj = moneyPrices[index]
+    if (obj.periodCode == moneyInfo.periodCode) {
+      console.log('古币: ' + moneyInfo.periodCode + '   价格: ' + getRandomNum(obj.min, obj.max))
+      moneyInfo.price = getRandomNum(obj.min, obj.max)
+    }
+
+  }
 
   // 将数据入库
   moneyInfo.moneyDetailUrl = url
@@ -287,6 +314,19 @@ function fsExistsSync(path) {
 function getImageFormat(imageUrl) {
   var ext = imageUrl.split('.').pop()  // 获取图片的格式
   return '.' + ext
+}
+
+/**
+ * 获取指定范围内的随机数
+ * @param min 最小值
+ * @param max 最大值
+ * @returns 随机数
+ */
+function getRandomNum(min, max) {
+  var range = max - min
+  var random = Math.round(Math.random() * range);
+  var num = min + random
+  return num
 }
 
 // 设置启动项
