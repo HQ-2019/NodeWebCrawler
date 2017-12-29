@@ -6,6 +6,7 @@
   "dependencies": {
     "bufferhelper": "^0.2.1",
     "cheerio": "^1.0.0-rc.2",
+    "debug": "^3.1.0",
     "mysql2": "^1.5.1",
     "sequelize": "^4.28.6"
   },
