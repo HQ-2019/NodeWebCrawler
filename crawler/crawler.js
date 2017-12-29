@@ -5,6 +5,7 @@ var moneyController = require('./controller/moneyController')
 var url = 'http://www.cnm.com.cn/zgqbbwg/132452/index.html'
 var host = 'http://www.cnm.com.cn'
 var imageSource = __dirname + '/images'   // 存放图片的目录地址
+var imageHost = 'http://download.iqianzhan.com/'
 
 
 /**
@@ -14,9 +15,8 @@ var imageSource = __dirname + '/images'   // 存放图片的目录地址
 function loadMoneyHomeUrl(url) {
   http.get(url, function(res) {
     console.log("加载URL : " + url)
-
     var html = ''
-
+    res.setEncoding('utf-8')
     res.on('data', function(data) {
       // 获取html网页内容
       html += data
@@ -40,7 +40,7 @@ function loadMoneyHomeUrl(url) {
 function loadMoneyPeriodLisUrl(periodListUrl, pageIndex,  lastPageItemNumer, moneyInfo) {
   http.get(periodListUrl, function (res) {
     var html = ''
-
+    res.setEncoding('utf-8')
     res.on('data', function(data) {
       html += data
     })
@@ -60,7 +60,7 @@ function loadMoneyPeriodLisUrl(periodListUrl, pageIndex,  lastPageItemNumer, mon
 function loadMoneyDetailUrl(moneyDetailUrl, moneyInfo) {
   http.get(moneyDetailUrl, function (res) {
     var html = ''
-
+    res.setEncoding('utf-8')
     res.on('data', function(data) {
       // 获取html网页内容
       html += data
@@ -145,17 +145,18 @@ function filterMoneyPeriodListData(html, index, lastPageItemNumer, moneyInfo) {
     }
     info.moneyName = modeyItem.find('p').find('a').text()
     info.moneyCode = moneyInfo.periodCode + (item + 1 + lastPageItemNumer)
-    info.moneyContent = modeyItem.find('p').text()
-    info.moneyThumbnailUrl = encodeURI(host + modeyItem.find('img').attr('src')) // URL有中文需要转义
+    // info.moneyContent = modeyItem.find('p').text()
+    var thumbnailUrl = encodeURI(host + modeyItem.find('img').attr('src')) // URL有中文需要转义
+    info.moneyThumbnailUrl = imageHost + info.moneyCode + getImageFormat(thumbnailUrl)
 
-    var imagePath = createFilePath(info.periodCode, info.moneyCode + getImageFormat(info.moneyThumbnailUrl))
+    var imagePath = createFilePath(info.periodCode, info.moneyCode + getImageFormat(thumbnailUrl))
 
     console.log("古币编号: " + info.moneyCode + "  古币名称: " + info.moneyName + "  页面: " + index + "  详情页面的URL: " + moneyDetailUrl)
     // 加载古币详情
     loadMoneyDetailUrl(moneyDetailUrl, info)
     // 下载缩略图 (当图片还未存在时)
     if (!fsExistsSync(imagePath)) {
-      downloadImage(info.moneyThumbnailUrl, imagePath)
+      downloadImage(thumbnailUrl, imagePath)
     }
   })
 
@@ -189,6 +190,11 @@ function filterMoneyDetailData(html, moneyInfo) {
   imageList.each(function (item) {
     var imageItem = $(this)
     var imageUrl = imageItem.find('img').attr('src')
+
+    var content = imageItem.text()
+    if (content.length > 0) {
+      moneyInfo.moneyContent = content
+    }
 
     if (imageUrl){
       imageUrl = host + imageUrl
